@@ -280,3 +280,61 @@ Update documentation
 
 Run linters before committing
 
+
+
+
+# 📚 Commands
+
+## Network Commands
+
+| Command | Description |
+|---------|-------------|
+| `ping <target>` | Ping a target |
+| `traceroute <target>` | Trace route |
+| `nmap <target> [type]` | Port scan |
+| `curl <url>` | HTTP request |
+| `netcat <host> <port>` | Netcat connection |
+
+## Exploitation Commands
+
+| Command | Description |
+|---------|-------------|
+| `metasploit_search <query>` | Search exploits |
+| `metasploit_exploit <exploit> <payload> <target>` | Run exploit |
+| `metasploit_payload <type> <lhost> <lport> <output>` | Generate payload |
+| `metasploit_handler <lhost> <lport>` | Start handler |
+
+## Social Engineering Commands
+
+| Command | Description |
+|---------|-------------|
+| `phish_<platform>` | Generate phishing link |
+| `phish_start <link_id> [port]` | Start phishing server |
+| `phish_stop` | Stop phishing server |
+| `phish_creds [link_id]` | View captured credentials |
+
+## Keylogger Commands
+
+| Command | Description |
+|---------|-------------|
+| `keylogger_start` | Start keylogger |
+| `keylogger_stop` | Stop keylogger |
+| `keylogger_status` | Check status |
+| `keylogger_logs [limit]` | View keylogs |
+| `keylogger_screenshots` | View screenshots |
+
+## System Commands
+
+| Command | Description |
+|---------|-------------|
+| `status` | System status |
+| `history [limit]` | Command history |
+| `system` | System info |
+| `threats [limit]` | Recent threats |
+| `report` | Security report |
+| `help` | Help menu |
+
+
+
+
+
