@@ -20,31 +20,33 @@ docker run -d \
 # Manual Install
 
 # Clone repository
+
 ```bash
 git clone https://github.com/Iankulani/war-shark-v1.git
-cd war-shark
+cd war-shark-v1
 ```
 # Run installation script
+
 ```bash
 sudo chmod +x install.sh
 sudo ./install.sh
 ```
 # 📦 Installation
-Prerequisites
-Python 3.8+
+* Prerequisites
+* Python 3.8+
 
-pip
+* pip
 
-git
+* git
 
-Nmap
+* Nmap
 
-Netcat
+* Netcat
 
-curl/wget
+* curl/wget
 
-Linux (Debian/Ubuntu)
-bash
+# Linux (Debian/Ubuntu)
+
 # Install system dependencies
 ```bash
 sudo apt-get update
