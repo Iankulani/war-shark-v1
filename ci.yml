@@ -1,0 +1,323 @@
+# ==============================================================================
+# WAR-SHARK-v1 - GitHub Actions CI/CD Pipeline
+# Author: Ian Carter Kulani
+# Version: 1.0.0
+# ==============================================================================
+
+name: WAR-SHARK CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  PROJECT_NAME: war-shark
+  PROJECT_VERSION: 1.0.0
+  PYTHON_VERSION: '3.11'
+  DOCKER_IMAGE: ${{ github.repository }}
+
+jobs:
+  # ============================================================================
+  # VALIDATE
+  # ============================================================================
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+      
+      - name: Validate Python syntax
+        run: python -m py_compile war_shark.py
+      
+      - name: Validate requirements
+        run: pip check
+      
+      - name: Validate YAML
+        run: |
+          pip install yamllint
+          yamllint -d relaxed .github/workflows/ci.yml docker-compose.yml
+
+  # ============================================================================
+  # TEST
+  # ============================================================================
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: validate
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nmap netcat-openbsd dnsutils traceroute whois libpcap-dev
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+      
+      - name: Run tests
+        run: |
+          pytest tests/ -v \
+            --cov=war_shark \
+            --cov-report=xml \
+            --cov-report=html \
+            --junitxml=junit.xml
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.python-version }}
+          path: |
+            junit.xml
+            coverage.xml
+            coverage_html/
+
+  # ============================================================================
+  # LINT
+  # ============================================================================
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install linters
+        run: |
+          pip install black flake8 isort mypy pylint
+      
+      - name: Black
+        run: black --check --diff war_shark.py
+        continue-on-error: true
+      
+      - name: isort
+        run: isort --check-only --diff war_shark.py
+        continue-on-error: true
+      
+      - name: Flake8
+        run: flake8 war_shark.py --max-line-length=120 --ignore=E501,W503,E203
+        continue-on-error: true
+      
+      - name: MyPy
+        run: mypy war_shark.py --ignore-missing-imports
+        continue-on-error: true
+
+  # ============================================================================
+  # SECURITY
+  # ============================================================================
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install bandit safety
+      
+      - name: Bandit
+        run: bandit -r war_shark.py -f json -o bandit-report.json
+        continue-on-error: true
+      
+      - name: Safety
+        run: safety check --json --output safety-report.json
+        continue-on-error: true
+      
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+      
+      - name: CodeQL Initialize
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+      
+      - name: CodeQL Analyze
+        uses: github/codeql-action/analyze@v3
+
+  # ============================================================================
+  # BUILD
+  # ============================================================================
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install build tools
+        run: |
+          pip install build twine
+      
+      - name: Build package
+        run: python -m build
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  # ============================================================================
+  # DOCKER
+  # ============================================================================
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ env.DOCKER_IMAGE }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ env.PROJECT_VERSION }}
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
+
+  # ============================================================================
+  # RELEASE
+  # ============================================================================
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [build, docker]
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================================
+  # NOTIFY
+  # ============================================================================
+  notify:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [build, docker]
+    if: always() && github.ref == 'refs/heads/main'
+    steps:
+      - name: Discord Notification
+        if: ${{ secrets.DISCORD_WEBHOOK != '' }}
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            🦈 **WAR-SHARK Pipeline ${{ job.status }}**
+            Branch: `${{ github.ref_name }}`
+            Commit: `${{ github.sha }}`
+            [View Pipeline](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
