@@ -54,7 +54,9 @@ sudo apt-get install -y python3 python3-pip python3-venv git nmap netcat-openbsd
 ```
 
 # Clone and install
-git clone https://github.com/ian-carter-kulani/war-shark.git
+
+```bash
+git clone https://github.com//Iankulani/war-shark.git
 cd war-shark
 python3 -m venv venv
 source venv/bin/activate
