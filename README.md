@@ -8,20 +8,22 @@
 
 
 
-Docker
-bash
+# Docker
+```bash
 docker run -d \
   --name war-shark \
   -p 5000:5000 \
   -p 8080:8080 \
   -v warshark-config:/root/.war_shark \
   warshark/war-shark:latest
-Manual Install
-bash
-# Clone repository
-git clone https://github.com/ian-carter-kulani/war-shark.git
-cd war-shark
+```
+# Manual Install
 
+# Clone repository
+```bash
+git clone https://github.com/Iankulani/war-shark-v1.git
+cd war-shark
+```
 # Run installation script
 ```bash
 sudo chmod +x install.sh
@@ -44,8 +46,10 @@ curl/wget
 Linux (Debian/Ubuntu)
 bash
 # Install system dependencies
+```bash
 sudo apt-get update
 sudo apt-get install -y python3 python3-pip python3-venv git nmap netcat-openbsd dnsutils traceroute whois
+```
 
 # Clone and install
 git clone https://github.com/ian-carter-kulani/war-shark.git
@@ -53,18 +57,20 @@ cd war-shark
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-Linux (RHEL/CentOS)
-bash
-# Install system dependencies
-sudo yum install -y python3 python3-pip git nmap nc bind-utils traceroute whois
+```
+    
+# Linux (RHEL/CentOS)
 
+# Install system dependencies
+```bash
+sudo yum install -y python3 python3-pip git nmap nc bind-utils traceroute whois
+```
 # Clone and install
 ```bash
-git clone https://github.com/ian-carter-kulani/war-shark.git
-cd war-shark
+git clone https://github.com/Iankulani/war-shark-v1.git
+cd war-shark-v1
 python3 -m venv venv
 source venv/bin/activate
-
 pip install -r requirements.txt
 ```
 # macOS
@@ -86,21 +92,23 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 pip install -r requirements.txt
-Windows
-powershell
+
+# Windows
+# powershell
 # Run PowerShell as Administrator
+```bash
 Set-ExecutionPolicy Bypass -Scope Process -Force
 .\install.ps1
 Or use the batch file:
-
+```
 cmd
 install.bat
 🐳 Docker
 Build Image
-bash
+```bash
 docker build -t warshark/war-shark:latest .
 Run Container
-```bash
+```
 docker run -d \
   --name war-shark \
   --cap-add=NET_ADMIN \
@@ -124,7 +132,8 @@ docker-compose up -d
 http://localhost:5000
 ```
 # ⚙️ Configuration
-Configuration is stored in ~/.war_shark/config.json.
+```bash
+Configuration is stored in ~/.war_shark-v1/config.json.
 
 Example Configuration
 json
@@ -152,16 +161,19 @@ Copy .env.example to .env and configure:
 bash
 cp .env.example .env
 nano .env
-🎮 Usage
+# 🎮 Usage
 Start WAR-SHARK
 bash
 # Activate virtual environment
+```bash
 source venv/bin/activate
-
+```
 # Run
+```bash
 python3 war_shark.py
 Interactive Shell
-```bash
+```
+
 🦈> help                    # Show all commands
 🦈> nmap 192.168.1.1        # Scan target
 🦈> phish_gmail             # Generate phishing link
