@@ -212,6 +212,7 @@ pment Environment
 ```
 
 # Clone repository
+
 ```bash
 git clone https://github.com/ian-carter-kulani/war-shark.git
 cd war-shark
@@ -238,25 +239,31 @@ pytest tests/ -v
 pytest tests/unit/ -v
 
 # With coverage
+```bash
 pytest tests/ --cov=war_shark --cov-report=html
 Linting
-bash
+```
 # Run all linters
+```bash
 make lint
+```
 
 # Format code
 make format
 Build
 bash
 # Build package
+```bash
 make build
-
+```
 # Build Docker image
+```bash
 make docker-build
 🧪 Testing
-bash
+```
+
 # Run all tests
-```basg
+```bash
 make test
 ```
 
