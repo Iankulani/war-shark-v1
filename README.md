@@ -7,6 +7,22 @@
 </div>
 
 
+War Shark is a cybersecurity research and command platform designed to provide security professionals, researchers, penetration testers, red-team practitioners, and ethical hackers with a centralized way to interact with cybersecurity tools and authorized testing environments. The platform is built around the idea of making security operations more accessible by allowing users to send and execute approved commands through multiple communication platforms.
+
+War Shark can be accessed through Discord, Telegram, Slack, Google Chat, and a Web Application, giving authorized users flexibility in how they interact with the platform. Instead of requiring a security researcher to remain connected to a single terminal interface, War Shark can provide a command-oriented interface through supported communication channels. Users can submit commands, receive responses, monitor activities, and interact with their authorized security environments from their preferred platform.
+
+The primary purpose of War Shark is cybersecurity research, education, security testing, and authorized penetration testing. It can be used in controlled laboratories, capture-the-flag environments, defensive security projects, vulnerability assessments, red-team exercises, and other situations where the user has explicit permission to test the target systems.
+
+War Shark can also serve as an experimental platform for researchers interested in remote command interfaces, security automation, network security, digital forensics, threat analysis, and cybersecurity operations. Researchers can use the platform to study how command-based security workflows can be integrated with modern communication systems and web technologies.
+
+For red-team and penetration-testing activities, War Shark can help authorized security teams organize testing commands and interact with systems that are part of an approved assessment. Security researchers can use it to experiment with defensive controls, logging, monitoring, authentication, access management, and incident-response workflows.
+
+War Shark may also be useful for researchers studying different hacker methodologies, including black-hat, white-hat, and red-hat concepts, from a security-research and educational perspective. However, the platform should only be used against systems, networks, applications, or devices for which the user has explicit authorization. Unauthorized access, disruption, credential theft, data destruction, or attacks against third-party infrastructure are outside the intended purpose of the project.
+
+The architecture of War Shark can be expanded with additional cybersecurity modules, command handlers, authentication mechanisms, logging systems, monitoring capabilities, and integrations. Its multi-platform design makes it possible to build security workflows that connect communication interfaces with authorized cybersecurity environments.
+
+War Shark is ultimately designed as a cybersecurity research platform where command execution, automation, communication, and security experimentation meet. Whether used in a personal laboratory, cybersecurity classroom, CTF environment, penetration-testing engagement, or professional security research project, War Shark provides a flexible foundation for exploring modern cybersecurity operations.
+
 
 # Docker
 ```bash
