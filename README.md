@@ -389,6 +389,6 @@ Run linters before committing
 
 # Star History
 
-
+[![Star History Chart](https://api.star-history.com/svg?repos=Iankulani/war-shark-v1&type=Date)](https://star-history.com/#Iankulani/war-shark-v1&Date)
 
 
